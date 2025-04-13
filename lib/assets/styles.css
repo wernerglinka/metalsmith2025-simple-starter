@@ -1,0 +1,255 @@
+body {
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+h1, h2, h3 {
+  font-family: 'Montserrat', sans-serif;
+}
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+header {
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+header .container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.home-link img {
+  width: 100px;
+  height: auto;
+}
+
+/* main menu */
+.main-menu {
+  display: flex;
+  justify-content: flex-end;
+  list-style: none;
+}
+.main-menu li {
+  padding: 0 20px;
+}
+.main-menu a {
+  text-decoration: none;
+  color: inherit !important;
+  display: inline-block; /* Add this to make transform work */
+  transition: transform 0.2s ease; /* Add transition for smooth effect */
+}
+.main-menu a:hover {
+  display: inline-block;
+  transform: scale(1.2);
+}
+/* active nav links */
+.home .home,
+.other-page .other-page,
+.blog .blog {
+  color: #ccc !important;
+  pointer-events: none;
+  cursor: default;
+}
+
+main {
+  padding: 50px 0;
+}
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+}
+img[src$='#full-width'] {
+  max-width: 100%;
+}
+footer {
+  background: #444;
+  padding: 20px;
+  color: #fff;
+  margin-top: auto;
+}
+.blog-image {
+  margin: 40px 0;
+}
+
+pre[class*="language-"] {
+  background: #f3f3f3;
+  border-left: 2px solid #000;
+  position: relative;
+  font-size: 14px;
+}
+pre[class*="language-javascript"]:after {
+  position: absolute;
+  top: 0;
+  right:0;
+  content: "js";
+  padding: 5px;
+  background-color: #f8f8f8;
+}
+.token.operator {
+  background: transparent;
+}
+
+.blog-author {
+  margin: 40px 0;
+  padding: 20px;
+  background-color: #f8f8f8;
+}
+.blog-author h2 {
+  margin-top: 0;
+}
+.blog-author > div {
+  display: flex;
+  justify-content: flex-start;
+}
+.blog-author img {
+  width: 150px;
+}
+.blog-author p {
+  padding-left: 50px;
+  font-style: italic;
+}
+.blog-list {
+  list-style: none;
+}
+.blog-list li {
+  padding-bottom: 50px;
+}
+
+.blog-list a {
+  text-decoration: none;
+  color: #333;
+}
+
+.blog-list a h2 {
+  display: inline-block;
+  color: #333;
+  border-bottom: 1px solid #333;
+  transition: color 0.5s ease-in-out;
+}
+.blog-list a:hover h2 {
+  color: blue;
+  border-bottom: 1px solid blue;
+}
+.blog-list time {
+  display: block;
+}
+
+blockquote {
+  border-left: 4px solid red;
+  background: #f8f8f8;
+  padding: 20px;
+  margin: 0;
+}
+
+.gitter-invite {
+  text-decoration: none;
+  margin-top: 50px;
+  display: block;
+}
+.gitter-invite p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f8f8;
+}
+.gitter-invite img {
+  width: 40px;
+  display: inline-block;
+  margin: 0 10px;
+}
+
+/* 404 page */
+.error-page main {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.error-page h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.error-page a {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 10px 20px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.error-page a:hover {
+  background-color: #e0e0e0;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid #eee;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 10px;
+}
+
+.pagination-page,
+.pagination-current,
+.pagination-previous,
+.pagination-next {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.pagination-page {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.pagination-current {
+  background-color: #333;
+  color: white;
+}
+
+.pagination-previous,
+.pagination-next {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.pagination-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-page:hover,
+.pagination-previous:hover,
+.pagination-next:hover {
+  background-color: #e0e0e0;
+}
