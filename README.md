@@ -7,7 +7,8 @@
   Metalsmith2025 Simple Starter
 </h1>
 
-This is a simple, functional blog starter built with Metalsmith, designed to serve as a learning resource for web developers exploring static site generation. It demonstrates the core concepts of Metalsmith with minimal complexity, making it perfect for beginners while still showcasing the power and flexibility that make Metalsmith a valuable tool in 2025.
+This is a simple, functional blog starter built with Metalsmith, designed to serve as a learning resource for web developers exploring static site generation. It demonstrates the core concepts of Metalsmith with minimal complexity, making it perfect for beginners while still showcasing the power and flexibility that make Metalsmith a valuable tool in 2025. A demo is available at [ms2025-simple-starter.netlify.app](https://ms2025-simple-starter.netlify.app/).
+
 
 ## Features
 
