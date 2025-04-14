@@ -1,22 +1,30 @@
 <!doctype html>
 <html class="no-js" lang="">
-
   <head>
     {% include "partials/head.njk" %}
   </head>
 
   <body class="{{ bodyClass }}">
-
-    {% include "partials/header.njk" %}
+    {% include "partials/header.njk" %} 
     
-    <main>
-    {% block body %}
-    {# will be replaced by page content #}
-    {% endblock %}
-    </main>
+    {% if navigation.breadcrumbs and navigation.breadcrumbs.length > 1 %}
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumbs">
+        {% for crumb in navigation.breadcrumbs %}
+        <li>
+          {% if loop.last %}
+          <span aria-current="page">{{ crumb.title }}</span>
+          {% else %}
+          <a href="{{ crumb.path }}">{{ crumb.title }}</a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </nav>
+    {% endif %}
+
+    <main>{% block body %} {# will be replaced by page content #} {% endblock %}</main>
 
     {% include "partials/footer.njk" %}
-    
   </body>
-  
 </html>

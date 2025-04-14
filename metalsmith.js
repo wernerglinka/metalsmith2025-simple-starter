@@ -32,7 +32,7 @@ const thisFile = fileURLToPath( import.meta.url ); // Gets the actual file path 
 const thisDirectory = dirname( thisFile ); // Gets the directory containing this script
 const mainFile = process.argv[ 1 ]; // Gets the file that was executed by Node.js
 
-/**  
+/**
  * ESM (ECMAScript Modules) doesn't support importing JSON directly
  * So we read the package.json file manually to get dependency information
  * @type {Object}
@@ -109,7 +109,8 @@ metalsmith
   .env( 'NODE_ENV', process.env.NODE_ENV ) // Pass NODE_ENV to plugins
   .source( './src' ) // Where to find source files
   .destination( './build' ) // Where to output the built site
-  .metadata( { // Global metadata available to all files
+  .metadata( {
+    // Global metadata available to all files
     msVersion: dependencies.metalsmith, // Metalsmith version
     nodeVersion: process.version // Node.js version
   } )
@@ -117,7 +118,10 @@ metalsmith
   // Exclude draft content in production mode
   .use( drafts( !isProduction ) )
 
-  // Create paginated blog pages
+  /**
+   * Create paginated blog pages
+   * Learn more: https://github.com/wernerglinka/metalsmith-simple-pagination
+   */
   .use(
     simplePagination( {
       directory: 'blog', // Directory containing blog posts
@@ -127,11 +131,14 @@ metalsmith
       outputDir: 'blog/:num', // Output pattern for pagination pages
       indexLayout: 'blog.njk', // Template for blog index pages
       firstIndexFile: 'blog.md', // Source file for first page
-      usePermalinks: true  // Use clean URLs
+      usePermalinks: true // Use clean URLs
     } )
   )
 
-  // Generate lists of blog posts (latest, featured)
+  /**
+   * Create lists of blog posts
+   * Learn more: https://github.com/wernerglinka/metalsmith-blog-lists
+   */
   .use(
     blogLists( {
       latestQuantity: 4, // Number of posts in latest list
@@ -143,7 +150,10 @@ metalsmith
     } )
   )
 
-  // Convert Markdown to HTML with syntax highlighting
+  /**
+   * Convert Markdown to HTML with syntax highlighting
+   * Learn more: https://github.com/wernerglinka/metalsmith-unified-markdown
+   */
   .use(
     markdown( {
       engineOptions: {
@@ -154,10 +164,16 @@ metalsmith
     } )
   )
 
-  // Create clean URLs (e.g., /about/ instead of /about.html)
+  /**
+   * Create clean URLs (e.g., /about/ instead of /about.html)
+   * Learn more: https://github.com/metalsmith/permalinks
+   */
   .use( permalinks() )
 
-  // Generate navigation menus
+  /**
+   * Generate navigation menus
+   * Learn more: https://github.com/wernerglinka/metalsmith-menu-plus
+   */
   .use(
     menus( {
       metadataKey: 'mainMenu', // Where to store menu data
@@ -166,31 +182,52 @@ metalsmith
     } )
   )
 
-  // Apply templates to content
+  /**
+   * Apply templates to content
+   * Learn more: https://github.com/metalsmith/layouts
+   */
   .use(
     layouts( {
       directory: 'lib/layouts', // Where to find templates
       transform: 'nunjucks', // Template engine to use
       pattern: [ '**/*.html', '**/robots.txt' ], // Files to apply templates to
-      engineOptions  // Options for the template engine
+      engineOptions // Options for the template engine
     } )
   )
 
-  // Copy static assets to the build directory
+  /**
+   * Copy static assets to the build directory
+   * Learn more: https://github.com/wernerglinka/metalsmith-static-files
+   */
   .use(
     assets( {
       source: 'lib/assets/', // Where to find assets
       destination: 'assets/' // Where to copy assets
     } )
-  );
+  )
+
+  /** 
+   * This can be used to check metadata
+   */
+  //.use( function( files, metalsmith, done ) {
+  //  console.log( metalsmith.metadata() );
+  // done();
+  //} )
+  ;
 
 // These plugins only run in production mode to optimize the site
 if ( isProduction ) {
   metalsmith
-    // Minify HTML to reduce file size
+    /**
+     * Optimize HTML by Minify HTML to reduce file size
+     * Learn more: https://github.com/wernerglinka/metalsmith-optimize-html
+     */
     .use( htmlMinifier() )
 
-    // Generate a sitemap.xml file for search engines
+    /**
+     * Generate a sitemap.xml file for search engines
+     * Learn more: https://github.com/ExtraHop/metalsmith-sitemap
+     */
     .use(
       sitemap( {
         hostname: siteURL, // Your site's URL

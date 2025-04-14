@@ -1,4 +1,13 @@
-.cache
+# Build output
+build/
+
+# Node modules
+node_modules/
+
+# Package files (maintain formatting)
 package.json
 package-lock.json
-public
+
+# Generated files
+*.min.js
+*.min.css

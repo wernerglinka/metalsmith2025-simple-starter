@@ -1,10 +1,10 @@
 // Configuration for ESLint 9.x
 export default [
   {
-    ignores: [ 'build/**/*', 'test/fixtures/**/*', 'node_modules/**/*', 'coverage/**/*' ]
+    ignores: ['build/**/*', 'test/fixtures/**/*', 'node_modules/**/*', 'coverage/**/*']
   },
   {
-    files: [ '**/*.js' ],
+    files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module'
@@ -13,7 +13,7 @@ export default [
       'no-console': [
         'warn',
         {
-          allow: [ 'warn', 'error' ]
+          allow: ['warn', 'error']
         }
       ],
       'prefer-const': 'error',
@@ -24,8 +24,8 @@ export default [
           argsIgnorePattern: '^_'
         }
       ],
-      eqeqeq: [ 'error', 'always' ],
-      curly: [ 'error', 'all' ],
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
       'dot-notation': 'error',
       'no-multi-assign': 'error',
       'prefer-template': 'error',
@@ -34,15 +34,15 @@ export default [
       'no-useless-return': 'error',
       'no-throw-literal': 'error',
       'no-await-in-loop': 'warn',
-      'max-depth': [ 'warn', 4 ],
-      'max-params': [ 'warn', 8 ],
-      complexity: [ 'warn', 15 ],
+      'max-depth': ['warn', 4],
+      'max-params': ['warn', 8],
+      complexity: ['warn', 15],
       // Custom rule for array bracket spacing
-      'array-bracket-spacing': [ 'error', 'always' ]
+      'array-bracket-spacing': ['error', 'always']
     }
   },
   {
-    files: [ 'test/**/*.js' ],
+    files: ['test/**/*.js'],
     rules: {
       'no-console': 'off',
       'max-depth': 'off',

@@ -1,5 +1,5 @@
 ---
-layout: blog-post.njk
+layout: blog-post-with-sidebar.njk
 bodyClass: "blog-post"
 draft: false
 

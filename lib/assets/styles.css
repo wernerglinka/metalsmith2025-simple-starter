@@ -253,3 +253,78 @@ blockquote {
 .pagination-next:hover {
   background-color: #e0e0e0;
 }
+
+/* breadcrumbs */
+.breadcrumbs {
+  max-width: 1024px;
+  margin: 2rem auto 0;
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+
+  li {
+    font-size: 0.8em;
+    color: #666;
+    text-transform: uppercase;
+    
+    &:after {
+      content: '>';
+      margin-left: 5px;
+    }
+    &:last-child {
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+
+.with-sidebar {
+  display: flex;
+  gap: 5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 30rem;
+    background-color: #f8f8f8;
+    padding: 2rem;
+    align-self: flex-start; /* Prevents the sidebar from stretching to full height */
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 2rem;
+      }
+
+      a {
+        text-decoration: none;
+        color: #333;
+        border-bottom: 1px solid #333;
+        transition: color 0.5s ease-in-out;
+      }
+
+      a:hover {
+        color: blue;
+        border-bottom: 1px solid blue;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.7rem;
+        color: #666;
+        text-transform: uppercase;
+      }
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
