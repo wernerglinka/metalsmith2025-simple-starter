@@ -58,11 +58,6 @@ To begin working with this starter:
 
 1. Clone the repository
 2. Run `npm install` to install dependencies
-3. Run `npm run build` to build the site
-4. Run `npm run serve` to view the site locally
+3. Run `npm start` to build and view the site locally
 
 The project is intentionally kept simple to make it easy to understand and modify. Explore the code, make changes, and watch how Metalsmith transforms your content!
-
----
-
-Created with ❤️ by [Werner Glinka](https://glinka.co)

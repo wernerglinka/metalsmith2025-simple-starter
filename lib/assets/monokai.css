@@ -7,9 +7,9 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 .hljs {
   display: block;
   padding: 2rem;
-  line-height: 1.5;
   background: #23241f;
   color: #f8f8f2;
+  overflow-x: auto;
 }
 
 .hljs-tag,

@@ -14,7 +14,7 @@
     "build": "metalsmith -c metalsmith.js --env NODE_ENV=production",
     "start": "NODE_ENV=development DEBUG=@metalsmith* node metalsmith.js --watch",
     "serve": "browser-sync start --server 'build'",
-    "format": "prettier --write \"**/*.{js,json,njk}\"",
+    "format": "prettier --write \"**/*.{js,json,njk,css}\"",
     "lint": "eslint --fix .",
     "fix": "npm run format && npm run lint",
     "depcheck": "depcheck"

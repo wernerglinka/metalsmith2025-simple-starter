@@ -5,9 +5,7 @@
   </head>
 
   <body class="{{ bodyClass }}">
-    {% include "partials/header.njk" %} 
-    
-    {% if navigation.breadcrumbs and navigation.breadcrumbs.length > 1 %}
+    {% include "partials/header.njk" %} {% if navigation.breadcrumbs and navigation.breadcrumbs.length > 1 %}
     <nav aria-label="Breadcrumb">
       <ol class="breadcrumbs">
         {% for crumb in navigation.breadcrumbs %}
@@ -26,5 +24,8 @@
     <main>{% block body %} {# will be replaced by page content #} {% endblock %}</main>
 
     {% include "partials/footer.njk" %}
+
+    <!-- Mobile menu script -->
+    <script src="/assets/menu.js"></script>
   </body>
 </html>
