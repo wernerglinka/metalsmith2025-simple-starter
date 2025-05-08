@@ -1,7 +1,7 @@
 {
-  "name": "metalsmith-blog-starter",
+  "name": "metalsmith2025-simple-starter",
   "version": "1.0.0",
-  "description": "A simple Metalsmith blog starter",
+  "description": "A simple Metalsmith starter for 2025",
   "type": "module",
   "keywords": [
     "metalsmith",
