@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "browser-sync": "^3.0.4",
-    "eslint": "^9.25.1",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3"
   },
   "dependencies": {

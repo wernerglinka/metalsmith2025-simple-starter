@@ -210,22 +210,14 @@ metalsmith
   /**
    * Copy static assets to the build directory
    * Learn more: https://github.com/wernerglinka/metalsmith-static-files
+   * https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview
    */
   .use(
     assets( {
       source: 'lib/assets/', // Where to find assets
       destination: 'assets/' // Where to copy assets
     } )
-  )
-
-  /**
-   * This can be used to check metadata
-   */
-  .use( function( files, metalsmith, done ) {
-    console.log( metalsmith.metadata() );
-    done();
-  } )
-  ;
+  );
 
 // These plugins only run in production mode to optimize the site
 if ( isProduction ) {
