@@ -202,7 +202,7 @@ metalsmith
     layouts( {
       directory: 'lib/layouts', // Where to find templates
       transform: 'nunjucks', // Template engine to use
-      pattern: [ '**/*.html', '**/robots.txt' ], // Files to apply templates to
+      pattern: [ '**/*.html' ], // Files to apply templates to
       engineOptions // Options for the template engine
     } )
   )
