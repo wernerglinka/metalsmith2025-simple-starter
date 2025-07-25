@@ -7,9 +7,9 @@ navigation:
   navIndex: 0
 
 seo:
-  title: Metalsmith Blog Starter
-  description: "A blog starter build with Metalsmith"
-  socialImage: "/assets/images/metalsmith-starter-social.png"
+  title: Metalsmith2025 Simple Starter
+  description: "This starter should get you up and running with your new favorite static site generator Metalsmith"
+  socialImage: "/assets/images/metalsmith2025-starter-social.png"
   canonicalOverwrite: ""
 ---
 # Welcome to Metalsmith2025 Simple Starter
