@@ -33,7 +33,7 @@
     "marked": "^16.1.1",
     "metalsmith": "^2.6.3",
     "metalsmith-blog-lists": "^2.1.0",
-    "metalsmith-menu-plus": "^0.1.0",
+    "metalsmith-menu-plus": "^0.2.0",
     "metalsmith-optimize-html": "^0.5.3",
     "metalsmith-simple-pagination": "^0.0.4",
     "metalsmith-sitemap": "^1.2.2",
