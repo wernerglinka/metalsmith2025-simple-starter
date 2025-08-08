@@ -130,8 +130,14 @@ metalsmith
   .clean( true ) // Clean the destination directory before building
   .ignore( [ '**/.DS_Store' ] ) // Ignore macOS system files
   .watch( isProduction ? false : [ 'src', 'lib/layouts', 'lib/assets' ] ) // Watch for changes in development mode only
-  .env( 'NODE_ENV', process.env.NODE_ENV ) // Pass NODE_ENV to plugins
-  //.env( 'DEBUG', 'metalsmith-safe-links' ) // Enable debug logging for safe links plugin
+  .env( 'NODE_ENV', process.env.NODE_ENV ); // Pass NODE_ENV to plugins
+
+// Pass DEBUG environment variable if it exists
+if ( process.env.DEBUG ) {
+  metalsmith.env( 'DEBUG', process.env.DEBUG );
+}
+
+metalsmith
   .source( './src' ) // Where to find source files
   .destination( './build' ) // Where to output the built site
   .metadata( {
