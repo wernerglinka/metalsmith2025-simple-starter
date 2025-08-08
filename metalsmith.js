@@ -1,198 +1,337 @@
-import { fileURLToPath } from 'node:url';
-import path, { dirname } from 'node:path';
+/**
+ * Metalsmith Build Configuration
+ *
+ * This file configures how Metalsmith builds your site. Each section is documented
+ * to help beginners understand what's happening at each step.
+ */
 
-import Metalsmith from 'metalsmith';
-import drafts from '@metalsmith/drafts';
-import markdown from 'metalsmith-unified-markdown';
-import permalinks from '@metalsmith/permalinks';
-import blogLists from 'metalsmith-blog-lists';
-import menus from 'metalsmith-menu-plus';
-import layouts from '@metalsmith/layouts';
-import assets from 'metalsmith-static-files';
-import htmlMinifier from 'metalsmith-optimize-html';
-import sitemap from 'metalsmith-sitemap';
-import simplePagination from 'metalsmith-simple-pagination';
+// Apply File API polyfill if needed (for GitHub Actions compatibility)
+import './file-polyfill.js';
 
-import rehypeHighlight from 'rehype-highlight';
+// These are built-in Node.js modules needed for file paths and operations
+import { fileURLToPath } from 'node:url'; // Converts file:// URLs to file paths
+import path, { dirname } from 'node:path'; // Handles file paths across different OS
+import * as fs from 'node:fs'; // File system operations (read/write files)
 
-import { performance } from 'perf_hooks';
-import browserSync from 'browser-sync';
+// The main Metalsmith library and plugins that transform your content
+import Metalsmith from 'metalsmith'; // The core static site generator
+import drafts from '@metalsmith/drafts'; // Excludes draft content from builds
+import markdown from 'metalsmith-unified-markdown'; // Converts Markdown to HTML
+import permalinks from '@metalsmith/permalinks'; // Creates clean URLs
+import blogLists from 'metalsmith-blog-lists'; // Creates lists of blog posts
+import menus from 'metalsmith-menu-plus'; // Generates navigation menus
+import layouts from '@metalsmith/layouts'; // Applies templates to content
+import safeLinks from 'metalsmith-safe-links'; // Ensures links are safe and valid
+import assets from 'metalsmith-static-files'; // Copies static assets to build
+import htmlMinifier from 'metalsmith-optimize-html'; // Minifies HTML in production
+import sitemap from 'metalsmith-sitemap'; // Generates a sitemap.xml file
+import simplePagination from 'metalsmith-simple-pagination'; // Creates paginated blog pages
 
-const thisFile = fileURLToPath(import.meta.url);
-const thisDirectory = dirname(thisFile);
-const mainFile = process.argv[1];
+import rehypeHighlight from 'rehype-highlight'; // Syntax highlighting for code blocks
+import { performance } from 'perf_hooks'; // Measures build performance
+import browserSync from 'browser-sync'; // Live-reload development server
 
-// ESM does not currently import JSON modules by default.
-// Ergo we'll JSON.parse the file manually
-import * as fs from 'node:fs';
-const dependencies = JSON.parse(fs.readFileSync('./package.json')).dependencies;
+// These variables help determine the current directory and file paths
+const thisFile = fileURLToPath( import.meta.url ); // Gets the actual file path of this script
+const thisDirectory = dirname( thisFile ); // Gets the directory containing this script
+const mainFile = process.argv[ 1 ]; // Gets the file that was executed by Node.js
 
 /**
- * @function dataToNunjucksGlobals
- * @returns {Object} An object of objects with the file name as the key and
- *  the file content as the value
- *
- * This function adds metadata files to the build process programmatically.
+ * ESM (ECMAScript Modules) doesn't support importing JSON directly
+ * So we read the package.json file manually to get dependency information
+ * @type {Object}
  */
-const dataToNunjucksGlobals = () => {
-  const dataDir = path.join(thisDirectory, 'lib', 'data');
-  const files = fs.readdirSync(dataDir);
-  return files.reduce((obj, file) => {
-    ``;
-    const fileName = file.replace('.json', '');
-    const fileContents = fs.readFileSync(path.join(dataDir, file), 'utf8');
-    obj[fileName] = JSON.parse(fileContents);
+const dependencies = JSON.parse( fs.readFileSync( './package.json' ) ).dependencies;
+
+/**
+ * @function getGlobalMetadata
+ * @returns {Object} An object containing all JSON data files from lib/data directory
+ *
+ * This function reads all JSON files from the data directory and adds their data
+ * to a metadata object. This object can then be added to the Metalsmith metadata.
+ * /lib/data/
+ *   - site.json
+ *   - social.json
+ *   - validate.json
+ * 
+ * becomes
+ * {
+ *   site: {...},
+ *   social: {...},
+ *   validate: {...}
+ * }
+ */
+const getGlobalMetadata = () => {
+  const dataDir = path.join( thisDirectory, 'lib', 'data' ); // Path to data directory
+  const files = fs.readdirSync( dataDir ); // Get all files in directory
+
+  // Process each JSON file and add it to the result object
+  return files.reduce( ( obj, file ) => {
+    const fileName = file.replace( '.json', '' ); // Remove .json extension
+    const fileContents = fs.readFileSync( path.join( dataDir, file ), 'utf8' );
+    obj[ fileName ] = JSON.parse( fileContents ); // Parse JSON content
     return obj;
-  }, {});
+  }, {} );
 };
 
-// get siteURL from lib/data/site.json for sitemap use below
-const siteURL = dataToNunjucksGlobals().site.siteURL;
+const globalMetadata = getGlobalMetadata();
+
+// Get the site URL for use in the sitemap plugin
+const siteURL = globalMetadata.site.siteURL;
 
 /**
- * engineOptions
- * @type {Object}
- * @description This object is passed to the layouts plugin and allows us to
- *  pass options to the Nunjucks templating engine.
+ * TEMPLATE ENGINE SETUP
+ * Import custom Nunjucks filters that extend the template engine
+ * These filters provide additional functionality like date formatting,
+ * string manipulation, and more.
  */
 import * as nunjucksFilters from './nunjucks-filters/index.js';
 
+/**
+ * Configuration options for the Nunjucks template engine
+ * @type {Object}
+ */
 const engineOptions = {
-  path: ['lib/layouts'],
-  filters: nunjucksFilters,
-  globals: { refData: dataToNunjucksGlobals() }
+  path: [ 'lib/layouts' ], // Where to find template files
+  filters: nunjucksFilters, // Custom filters for templates
 };
 
+/**
+ * ENVIRONMENT SETUP
+ * Determine if we're in production mode based on NODE_ENV environment variable
+ * @type {boolean}
+ */
 const isProduction = process.env.NODE_ENV !== 'development';
+
+/**
+ * Base path for serving the site
+ * This is useful if the site will be hosted in a subdirectory
+ * e.g., https://example.com/subdirectory/
+ * or https://wernerglinka.github.io/metalsmith2025-simple-starter/
+ */
+const basePath = process.env.BASE_PATH || '';
+
+
+// Variable to hold the development server instance
 let devServer = null;
 
-/** @type {Metalsmith} */
-const metalsmith = Metalsmith(thisDirectory);
+/**
+ * Create a new Metalsmith instance
+ * This is the core object that will build our site
+ * @type {Metalsmith}
+ */
+const metalsmith = Metalsmith( thisDirectory );
 
+/**
+ * Configure the basic Metalsmith settings
+ * These determine how Metalsmith will process our files
+ */
 metalsmith
-  .clean(true)
-  .ignore(['**/.DS_Store'])
-  .watch(isProduction ? false : ['src', 'lib/layouts', 'lib/assets'])
-  .env('NODE_ENV', process.env.NODE_ENV)
-  .source('./src')
-  .destination('./build')
-  .metadata({
-    msVersion: dependencies.metalsmith,
-    nodeVersion: process.version
-  })
+  .clean( true ) // Clean the destination directory before building
+  .ignore( [ '**/.DS_Store' ] ) // Ignore macOS system files
+  .watch( isProduction ? false : [ 'src', 'lib/layouts', 'lib/assets' ] ) // Watch for changes in development mode only
+  .env( 'NODE_ENV', process.env.NODE_ENV ) // Pass NODE_ENV to plugins
+  //.env( 'DEBUG', 'metalsmith-safe-links' ) // Enable debug logging for safe links plugin
+  .source( './src' ) // Where to find source files
+  .destination( './build' ) // Where to output the built site
+  .metadata( {
+    // Global metadata available to all files
+    msVersion: dependencies.metalsmith, // Metalsmith version
+    nodeVersion: process.version, // Node.js version
+    ...globalMetadata, // Global data from JSON files in /lib/data
+    site: {
+      ...globalMetadata.site,
+      basePath: process.env.BASE_PATH || '' // Available for future use
+    }
+  } )
 
-  .use(drafts(!isProduction))
+  // Exclude draft content in production mode
+  .use( drafts( !isProduction ) )
 
+  /**
+   * Create paginated blog pages
+   * Learn more: https://github.com/wernerglinka/metalsmith-simple-pagination
+   */
   .use(
-    simplePagination({
-      directory: 'blog',
-      perPage: 2,
-      sortBy: 'post.date',
-      reverse: true,
-      outputDir: 'blog/:num',
-      indexLayout: 'blog.njk',
-      firstIndexFile: 'blog.md',
-      usePermalinks: true
-    })
+    simplePagination( {
+      directory: 'blog', // Directory containing blog posts
+      perPage: 2, // Number of posts per page
+      sortBy: 'post.date', // Sort posts by date
+      reverse: true, // Newest posts first
+      outputDir: 'blog/:num', // Output pattern for pagination pages
+      indexLayout: 'blog.njk', // Template for blog index pages
+      firstIndexFile: 'blog.md', // Source file for first page
+      usePermalinks: true // Use clean URLs
+    } )
   )
 
+  /**
+   * Create lists of blog posts
+   * Learn more: https://github.com/wernerglinka/metalsmith-blog-lists
+   */
   .use(
-    blogLists({
-      latestQuantity: 4,
-      featuredQuantity: 2,
-      featuredPostOrder: 'desc',
-      fileExtension: '.md',
-      blogDirectory: './blog',
-      blogObject: 'post'
-    })
+    blogLists( {
+      latestQuantity: 4, // Number of posts in latest list
+      featuredQuantity: 2, // Number of posts in featured list
+      featuredPostOrder: 'desc', // Sort order for featured posts
+      fileExtension: '.md', // File extension for blog posts
+      blogDirectory: './blog', // Directory containing blog posts
+      blogObject: 'post' // Object name for blog post metadata
+    } )
   )
 
+  /**
+   * Convert Markdown to HTML with syntax highlighting
+   * Learn more: https://github.com/wernerglinka/metalsmith-unified-markdown
+   */
   .use(
-    markdown({
+    markdown( {
       engineOptions: {
         extended: {
-          rehypePlugins: [rehypeHighlight]
+          rehypePlugins: [ rehypeHighlight ] // Add syntax highlighting
         }
       }
-    })
+    } )
   )
 
-  .use(permalinks())
+  /**
+   * Create clean URLs (e.g., /about/ instead of /about.html)
+   * Learn more: https://github.com/metalsmith/permalinks
+   */
+  .use( permalinks() )
 
+  /**
+   * Generate navigation menus
+   * Learn more: https://github.com/wernerglinka/metalsmith-menu-plus
+   */
   .use(
-    menus({
-      metadataKey: 'mainMenu',
-      usePermalinks: true,
-      navExcludePatterns: ['404.html', 'robots.txt']
-    })
+    menus( {
+      metadataKey: 'mainMenu', // Where to store menu data
+      usePermalinks: true, // Use clean URLs in menu
+      navExcludePatterns: [ '404.html', 'robots.txt' ] // Files to exclude from menu
+    } )
   )
 
+  /**
+   * Apply templates to content
+   * Learn more: https://github.com/metalsmith/layouts
+   */
   .use(
-    layouts({
-      directory: 'lib/layouts',
-      transform: 'nunjucks',
-      pattern: ['**/*.html', '**/robots.txt'],
-      engineOptions
-    })
+    layouts( {
+      directory: 'lib/layouts', // Where to find templates
+      transform: 'nunjucks', // Template engine to use
+      pattern: [ '**/*.html' ], // Files to apply templates to
+      engineOptions // Options for the template engine
+    } )
   )
 
+  /**
+   * Ensure all links are safe and valid
+   * Learn more: https://github.com/wernerglinka/metalsmith-safe-links
+   */
   .use(
-    assets({
-      source: 'lib/assets/',
-      destination: 'assets/'
-    })
+    safeLinks( {
+      hostnames: [ 'localhost:3000', 'wernerglinka.github.io' ],
+      basePath: basePath
+    } )
+  )
+
+  /**
+   * Copy static assets to the build directory
+   * Learn more: https://github.com/wernerglinka/metalsmith-static-files
+   * https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview
+   */
+  .use(
+    assets( {
+      source: 'lib/assets/', // Where to find assets
+      destination: 'assets/' // Where to copy assets
+    } )
   );
 
-if (isProduction) {
+// These plugins only run in production mode to optimize the site
+if ( isProduction ) {
   metalsmith
-    .use(htmlMinifier())
+    /**
+     * Optimize HTML by Minify HTML to reduce file size
+     * Learn more: https://github.com/wernerglinka/metalsmith-optimize-html
+     */
+    .use( htmlMinifier() )
 
-    // Add sitemap in production builds
+    /**
+     * Generate a sitemap.xml file for search engines
+     * Learn more: https://github.com/ExtraHop/metalsmith-sitemap
+     */
     .use(
-      sitemap({
-        hostname: siteURL,
-        omitIndex: true,
-        omitExtension: true,
-        changefreq: 'weekly',
-        lastmod: new Date(),
-        pattern: ['**/*.html', '!**/404.html'],
+      sitemap( {
+        hostname: siteURL, // Your site's URL
+        omitIndex: true, // Remove index.html from URLs
+        omitExtension: true, // Remove .html extensions
+        changefreq: 'weekly', // How often pages change
+        lastmod: new Date(), // Last modification date
+        pattern: [ '**/*.html', '!**/404.html' ], // Include all HTML except 404
         defaults: {
-          priority: 0.5,
-          changefreq: 'weekly',
-          lastmod: new Date()
+          priority: 0.5, // Default priority for pages
+          changefreq: 'weekly', // Default change frequency
+          lastmod: new Date() // Default last modified date
         }
-      })
+      } )
     );
 }
 
-// Check if this file is being executed directly (not imported as a module)
-if (mainFile === thisFile) {
-  // This block only runs when the file is executed directly (e.g., "node metalsmith.js")
-  // When imported by the Metalsmith CLI (e.g., "metalsmith -c metalsmith.js"), this block is skipped
-  // This prevents duplicate builds and allows the file to export the Metalsmith instance
+/**
+ * BUILD EXECUTION
+ * This section handles the actual build process and development server
+ * It only runs when this file is executed directly (not when imported)
+ */
+if ( mainFile === thisFile ) {
+  // Start timing the build for performance measurement
   let t1 = performance.now();
-  metalsmith.build((err) => {
-    if (err) {
+
+  // Execute the Metalsmith build
+  metalsmith.build( ( err ) => {
+    // Handle any build errors
+    if ( err ) {
       throw err;
     }
+
+    // Log build success and time taken
     /* eslint-disable no-console */
-    console.log(`Build success in ${((performance.now() - t1) / 1000).toFixed(1)}s`);
-    if (metalsmith.watch()) {
-      if (devServer) {
+    console.log( `Build success in ${ ( ( performance.now() - t1 ) / 1000 ).toFixed( 1 ) }s` );
+
+    // If watch mode is enabled, set up the development server
+    if ( metalsmith.watch() ) {
+      if ( devServer ) {
         t1 = performance.now();
         devServer.reload();
       } else {
         devServer = browserSync.create();
-        devServer.init({
+
+        const config = {
           host: 'localhost',
-          server: './build',
           port: 3000,
           injectChanges: false,
           reloadThrottle: 0
-        });
+        };
+
+        if ( basePath ) {
+          // Serve with subdirectory simulation
+          config.server = {
+            baseDir: './build',
+            routes: {
+              [ `/${ basePath }` ]: './build'
+            }
+          };
+          config.startPath = `/${ basePath }/`;
+        } else {
+          // Normal serving
+          config.server = './build';
+        }
+
+        devServer.init( config );
       }
     }
-  });
+  } );
 }
 
+// Export the Metalsmith instance for use in other files
 export default metalsmith;
